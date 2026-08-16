@@ -1,0 +1,187 @@
+import React from 'react';
+import { motion } from 'framer-motion';
+import * as Tooltip from '@radix-ui/react-tooltip';
+import * as Dialog from '@radix-ui/react-dialog';
+import { useLocation, useNavigate } from 'react-router-dom';
+import {
+  LayoutDashboard,
+  ShoppingCart,
+  Users,
+  Calendar,
+  Warehouse,
+  BarChart3,
+  Settings,
+  Sparkles,
+  ChevronRight,
+  X,
+  Scissors,
+  Smartphone,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+export type NavItemKey =
+  | 'dashboard'
+  | 'orders'
+  | 'clients'
+  | 'calendar'
+  | 'warehouse'
+  | 'reports'
+  | 'settings';
+
+interface SidebarProps {
+  collapsed: boolean;
+  mobileOpen: boolean;
+  onMobileOpenChange: (open: boolean) => void;
+}
+
+const navItems: { path: string; key: NavItemKey; label: string; icon: React.ElementType }[] = [
+  { path: '/', key: 'dashboard', label: 'Дашборд', icon: LayoutDashboard },
+  { path: '/orders', key: 'orders', label: 'Заказы / Navbatlar', icon: ShoppingCart },
+  { path: '/clients', key: 'clients', label: 'Клиенты (Mijozlar)', icon: Users },
+  { path: '/calendar', key: 'calendar', label: 'Календарь / Записи', icon: Calendar },
+  { path: '/warehouse', key: 'warehouse', label: 'Склад (Ombor)', icon: Warehouse },
+  { path: '/reports', key: 'reports', label: 'Отчёты (Hisobotlar)', icon: BarChart3 },
+  { path: '/settings', key: 'settings', label: 'Настройки', icon: Settings },
+];
+
+export function Sidebar({
+  collapsed,
+  mobileOpen,
+  onMobileOpenChange,
+}: SidebarProps) {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const sidebarContent = (isMobile = false) => (
+    <div className="flex flex-col h-full bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800/80 select-none">
+      {/* Navigation Items */}
+      <div className="flex-1 py-4 px-3 space-y-1.5 overflow-y-auto">
+        <Tooltip.Provider delayDuration={200}>
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive =
+              location.pathname === item.path ||
+              (item.path !== '/' && location.pathname.startsWith(item.path));
+
+            const buttonEl = (
+              <button
+                key={item.key}
+                onClick={() => {
+                  navigate(item.path);
+                  if (isMobile) onMobileOpenChange(false);
+                }}
+                className={cn(
+                  'relative flex items-center w-full gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 cursor-pointer group',
+                  isActive
+                    ? 'text-teal-700 dark:text-teal-300 bg-teal-500/10 dark:bg-teal-500/20 font-semibold'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                )}
+              >
+                {/* Active left indicator bar with framer-motion layoutId */}
+                {isActive && (
+                  <motion.div
+                    layoutId="activeNavIndicator"
+                    className="absolute left-0 top-2 bottom-2 w-1 bg-teal-600 dark:bg-teal-400 rounded-r-full"
+                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                  />
+                )}
+
+                <Icon
+                  className={cn(
+                    'w-5 h-5 shrink-0 transition-colors',
+                    isActive
+                      ? 'text-teal-600 dark:text-teal-400'
+                      : 'text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300'
+                  )}
+                />
+
+                {(!collapsed || isMobile) && (
+                  <span className="truncate">{item.label}</span>
+                )}
+              </button>
+            );
+
+            if (collapsed && !isMobile) {
+              return (
+                <Tooltip.Root key={item.key}>
+                  <Tooltip.Trigger asChild>{buttonEl}</Tooltip.Trigger>
+                  <Tooltip.Portal>
+                    <Tooltip.Content
+                      side="right"
+                      sideOffset={12}
+                      className="z-50 px-3 py-1.5 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-lg"
+                    >
+                      {item.label}
+                      <Tooltip.Arrow className="fill-slate-900 dark:fill-slate-800" />
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
+                </Tooltip.Root>
+              );
+            }
+
+            return buttonEl;
+          })}
+        </Tooltip.Provider>
+      </div>
+
+      {/* Footer section: Subscription plan badge & Upgrade button */}
+      <div className="p-3 border-t border-slate-200/80 dark:border-slate-800/80">
+        {!collapsed || isMobile ? (
+          <div className="p-3 rounded-2xl bg-gradient-to-br from-teal-500/10 via-emerald-500/5 to-transparent border border-teal-500/20 dark:border-teal-500/30">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs font-bold text-teal-700 dark:text-teal-300 flex items-center gap-1">
+                <Sparkles className="w-3.5 h-3.5" /> PRO PLAN
+              </span>
+              <span className="text-[10px] font-semibold text-slate-400">24d left</span>
+            </div>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-2.5">
+              Bezlimat navbatlar va kunlik hisobotlar
+            </p>
+            <button className="w-full py-1.5 px-3 text-xs font-semibold text-white bg-teal-600 hover:bg-teal-700 dark:bg-teal-600 dark:hover:bg-teal-500 rounded-xl transition-colors cursor-pointer shadow-xs flex items-center justify-center gap-1">
+              Обновить план <ChevronRight className="w-3 h-3" />
+            </button>
+          </div>
+        ) : (
+          <div className="flex justify-center">
+            <button
+              title="Pro Plan (24d left)"
+              className="p-2.5 rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400 hover:bg-teal-500/20 transition-colors"
+            >
+              <Sparkles className="w-5 h-5" />
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Desktop Sidebar (fixed left) */}
+      <aside
+        className={cn(
+          'hidden md:block fixed left-0 top-[61px] bottom-0 z-30 transition-all duration-300 ease-in-out',
+          collapsed ? 'w-[72px]' : 'w-[260px]'
+        )}
+      >
+        {sidebarContent(false)}
+      </aside>
+
+      {/* Mobile Drawer Sheet (<768px) */}
+      <Dialog.Root open={mobileOpen} onOpenChange={onMobileOpenChange}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="md:hidden fixed inset-0 bg-black/40 backdrop-blur-xs z-50 animate-fade-in" />
+          <Dialog.Content className="md:hidden fixed top-0 left-0 bottom-0 w-[280px] bg-white dark:bg-slate-900 z-50 shadow-2xl focus:outline-none animate-in slide-in-from-left">
+            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800">
+              <span className="font-bold text-slate-900 dark:text-slate-100">Меню Flexora</span>
+              <Dialog.Close className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <X className="w-5 h-5" />
+              </Dialog.Close>
+            </div>
+            <div className="h-[calc(100%-60px)]">{sidebarContent(true)}</div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+    </>
+  );
+}
