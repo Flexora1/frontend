@@ -103,13 +103,15 @@ export function Topbar({
         <div className="flex items-center justify-between px-3 sm:px-6 max-w-[1920px] mx-auto gap-2">
           {/* Left section: Sidebar toggle & Barbershop Brand Logo */}
           <div className="flex items-center gap-2.5">
-            <button
-              onClick={onToggleSidebar}
-              aria-label="Toggle Sidebar"
-              className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer select-none"
-            >
-              <PanelLeft className="w-5 h-5" />
-            </button>
+            {!location.pathname.startsWith('/barber') && location.pathname !== '/' && location.pathname !== '/booking' && (
+              <button
+                onClick={onToggleSidebar}
+                aria-label="Toggle Sidebar"
+                className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer select-none"
+              >
+                <PanelLeft className="w-5 h-5" />
+              </button>
+            )}
 
             <div
               onClick={() => navigate('/')}

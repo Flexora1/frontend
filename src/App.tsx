@@ -24,6 +24,8 @@ export function AppContent() {
   const [isOffline, setIsOffline] = useState<boolean>(false);
 
   const isClientPage = location.pathname === '/' || location.pathname === '/booking';
+  const isBarberPage = location.pathname.startsWith('/barber');
+  const hideSidebar = isClientPage || isBarberPage;
 
   const handleToggleOffline = () => {
     setIsOffline((prev) => {
@@ -57,8 +59,8 @@ export function AppContent() {
         onToggleSidebar={handleToggleSidebar}
       />
 
-      {/* Sidebar Navigation (Shown only for Manager & Worker views) */}
-      {!isClientPage && (
+      {/* Sidebar Navigation (Shown ONLY for Manager views, NOT for Barber or Client views) */}
+      {!hideSidebar && (
         <Sidebar
           collapsed={sidebarCollapsed}
           mobileOpen={mobileSidebarOpen}
@@ -70,7 +72,7 @@ export function AppContent() {
       <main
         className={cn(
           'transition-all duration-300 min-h-[calc(100vh-61px)] pb-12',
-          isClientPage
+          hideSidebar
             ? 'pl-0 max-w-5xl mx-auto px-4'
             : sidebarCollapsed
             ? 'md:pl-[72px]'
@@ -85,7 +87,7 @@ export function AppContent() {
           {/* Manager & Admin Route */}
           <Route path="/manager" element={<OwnerDashboard />} />
 
-          {/* Barber / Master Route */}
+          {/* Barber / Master Workspace Route (Dedicated view without Manager Sidebar) */}
           <Route path="/barber" element={<BarberView />} />
 
           <Route path="/orders" element={<OrdersPage />} />

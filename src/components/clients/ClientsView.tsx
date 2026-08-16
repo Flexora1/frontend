@@ -15,6 +15,7 @@ import {
   UserX,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 interface ClientRecord {
   id: string;
@@ -119,6 +120,7 @@ const mockClientsList: ClientRecord[] = [
 ];
 
 export function ClientsView() {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeStatusTab, setActiveStatusTab] = useState<string>('ALL');
 

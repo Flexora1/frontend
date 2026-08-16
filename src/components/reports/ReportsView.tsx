@@ -15,6 +15,7 @@ import {
   Filter,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
+import { useLanguage } from '@/i18n/LanguageContext';
 import { toast } from 'sonner';
 
 // Weekly Daily Data (Oxirgi hafta kunlik ko'rsatkichlari)
@@ -37,6 +38,7 @@ const monthlyWeeks = [
 ];
 
 export function ReportsView() {
+  const { t } = useLanguage();
   const [period, setPeriod] = useState<'week' | 'month' | 'quarter'>('week');
 
   const totalWeeklyRevenue = weeklyData.reduce((acc, d) => acc + d.revenue, 0);

@@ -14,6 +14,7 @@ import {
   Plus,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
+import { useLanguage } from '@/i18n/LanguageContext';
 import { toast } from 'sonner';
 
 interface CalendarEvent {
@@ -105,6 +106,7 @@ const mockEvents: CalendarEvent[] = [
 ];
 
 export function CalendarView() {
+  const { t } = useLanguage();
   const [selectedDate, setSelectedDate] = useState<string>('2026-08-16');
   const [selectedBarberFilter, setSelectedBarberFilter] = useState<string>('ALL');
 

@@ -450,6 +450,18 @@ export const barbershopApi = {
     };
 
     localBarbersStore.push(newBarber);
+
+    // Register in staffUsers so the new master can log in immediately
+    staffUsers.push({
+      id: newBarber.id,
+      name: fullName,
+      login: data.phone.toLowerCase().trim(),
+      phone: data.phone,
+      password: data.password || 'master123',
+      role: 'BARBER',
+    });
+
+    barbershopApi.notify();
     return newBarber;
   },
 

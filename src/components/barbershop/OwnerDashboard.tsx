@@ -27,6 +27,7 @@ import { toast } from 'sonner';
 export function OwnerDashboard() {
   const { t } = useLanguage();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [barbers, setBarbers] = useState<Barber[]>([]);
   const [addWorkerOpen, setAddWorkerOpen] = useState(false);
   const [dailySummary, setDailySummary] = useState<DailySummary | null>(null);
   const [loading, setLoading] = useState(true);

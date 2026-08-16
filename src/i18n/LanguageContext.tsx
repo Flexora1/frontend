@@ -57,7 +57,16 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 export function useLanguage() {
   const context = useContext(LanguageContext);
   if (context === undefined) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
+    const fallbackLang: Language = 'uz';
+    return {
+      language: fallbackLang,
+      setLanguage: () => {},
+      t: (key: string, params?: Record<string, string | number>) => {
+        const dict = translations[fallbackLang];
+        const template = dict[key] ?? key;
+        return interpolate(template, params);
+      },
+    };
   }
   return context;
 }
