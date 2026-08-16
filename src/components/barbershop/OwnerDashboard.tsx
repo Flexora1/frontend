@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { barbershopApi, barbershopServices } from '@/api/barbershopApi';
+import { AddWorkerModal } from './AddWorkerModal';
 import {
   Appointment,
   AppointmentStatus,
@@ -33,6 +34,7 @@ import { toast } from 'sonner';
 export function OwnerDashboard() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [barbers, setBarbers] = useState<Barber[]>([]);
+  const [addWorkerOpen, setAddWorkerOpen] = useState(false);
   const [supplies, setSupplies] = useState<SupplyItem[]>([]);
   const [dailySummary, setDailySummary] = useState<DailySummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -68,6 +70,8 @@ export function OwnerDashboard() {
 
   useEffect(() => {
     loadData();
+    const unsubscribe = barbershopApi.subscribe(loadData);
+    return () => unsubscribe();
   }, []);
 
   const handleStatusChange = async (
@@ -170,21 +174,7 @@ export function OwnerDashboard() {
         </div>
       </div>
 
-      {/* Low Stock Warning Banner if any */}
-      {lowStockSupplies.length > 0 && (
-        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2.5 text-amber-700 dark:text-amber-300 font-medium">
-            <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
-            <span>
-              Omborda kam qolgan sarf materiallari ({lowStockSupplies.length} ta):{' '}
-              <strong className="font-bold">{lowStockSupplies.map((s) => s.name).join(', ')}</strong>
-            </span>
-          </div>
-          <button className="px-3 py-1 rounded-lg bg-amber-600 text-white font-bold hover:bg-amber-700 transition-colors shrink-0">
-            + Xarid qilish
-          </button>
-        </div>
-      )}
+
 
       {/* 4 KPI Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -261,11 +251,20 @@ export function OwnerDashboard() {
 
       {/* Main Queue Timeline Grouped by Barber */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
-            Bugungi Ustalar Navbat Jadvali
-          </h2>
-          <span className="text-xs text-slate-400">Ustalar va ularning mijozlari</span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+              Bugungi Ustalar Navbat Jadvali
+            </h2>
+            <span className="text-xs text-slate-400">Ustalar va ularning mijozlari</span>
+          </div>
+
+          <button
+            onClick={() => setAddWorkerOpen(true)}
+            className="py-2 px-3 text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
+          >
+            <Plus className="w-4 h-4" /> Добавить нового работника
+          </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -575,6 +574,13 @@ export function OwnerDashboard() {
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
+
+      {/* Add Worker Modal (Manager Only) */}
+      <AddWorkerModal
+        open={addWorkerOpen}
+        onOpenChange={setAddWorkerOpen}
+        onWorkerAdded={loadData}
+      />
     </div>
   );
 }

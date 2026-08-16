@@ -18,7 +18,7 @@ const initialBarbers: Barber[] = [
     specialty: 'Fade & Soqol ustasi',
     isWorkingToday: true,
     status: 'BUSY',
-    phone: '+7 (999) 111-22-33',
+    phone: '+998 90 111 22 33',
     completedTodayCount: 6,
     todayEarnings: 450000,
   },
@@ -30,7 +30,7 @@ const initialBarbers: Barber[] = [
     specialty: 'Klassik va Zamonaviy sochlarga usta',
     isWorkingToday: true,
     status: 'FREE',
-    phone: '+7 (999) 222-33-44',
+    phone: '+998 91 222 33 44',
     completedTodayCount: 4,
     todayEarnings: 320000,
   },
@@ -42,7 +42,7 @@ const initialBarbers: Barber[] = [
     specialty: 'Bolalar sochi va Premium Kompleks',
     isWorkingToday: true,
     status: 'FREE',
-    phone: '+7 (999) 333-44-55',
+    phone: '+998 93 333 44 55',
     completedTodayCount: 5,
     todayEarnings: 480000,
   },
@@ -189,7 +189,77 @@ let localAppointmentsStore = [...initialAppointments];
 let localBarbersStore = [...initialBarbers];
 let localSuppliesStore = [...initialSupplies];
 
+export const staffUsers = [
+  {
+    id: 'usr-admin',
+    name: 'Menejer (Ega)',
+    login: 'admin@resto.uz',
+    phone: '+998 (90) 000-00-00',
+    password: 'admin123',
+    role: 'OWNER' as const,
+  },
+  {
+    id: 'bar-1',
+    name: 'Usta Alisher',
+    login: 'alisher',
+    phone: '+998 90 111 22 33',
+    password: 'master123',
+    role: 'BARBER' as const,
+  },
+  {
+    id: 'bar-2',
+    name: 'Usta Rustam',
+    login: 'rustam',
+    phone: '+998 91 222 33 44',
+    password: 'master123',
+    role: 'BARBER' as const,
+  },
+  {
+    id: 'bar-3',
+    name: 'Usta Jahongir',
+    login: 'jahongir',
+    phone: '+998 93 333 44 55',
+    password: 'master123',
+    role: 'BARBER' as const,
+  },
+];
+
+let listeners: Array<() => void> = [];
+
 export const barbershopApi = {
+  subscribe: (listener: () => void) => {
+    listeners.push(listener);
+    return () => {
+      listeners = listeners.filter((l) => l !== listener);
+    };
+  },
+
+  notify: () => {
+    listeners.forEach((l) => l());
+  },
+
+  // Authenticate Staff (Strict Security Check)
+  authenticateStaff: async (login: string, password: string, selectedRole: 'BARBER' | 'OWNER') => {
+    const cleanLogin = login.trim().toLowerCase();
+    const cleanPass = password.trim();
+
+    const foundUser = staffUsers.find((u) => {
+      const matchLogin =
+        u.login.toLowerCase() === cleanLogin ||
+        u.phone.replace(/[\s()\-]/g, '') === cleanLogin.replace(/[\s()\-]/g, '') ||
+        u.name.toLowerCase().includes(cleanLogin);
+      const matchPassword = u.password === cleanPass;
+      const matchRole = u.role === selectedRole;
+      return matchLogin && matchPassword && matchRole;
+    });
+
+    if (!foundUser) {
+      throw new Error("Noto'g'ri login, parol yoki mos kelmaydigan rol!");
+    }
+
+    return foundUser;
+  },
+
   // GET Appointments
   getAppointments: async (): Promise<Appointment[]> => {
     return [...localAppointmentsStore];
@@ -231,6 +301,7 @@ export const barbershopApi = {
 
     const updated = localAppointmentsStore.find((a) => a.id === id);
     if (!updated) throw new Error('Appointment not found');
+    barbershopApi.notify();
     return updated;
   },
 
@@ -246,6 +317,7 @@ export const barbershopApi = {
       isWalkIn: true,
     };
     localAppointmentsStore = [newApp, ...localAppointmentsStore];
+    barbershopApi.notify();
     return newApp;
   },
 
@@ -280,6 +352,7 @@ export const barbershopApi = {
     };
 
     localAppointmentsStore = [newApp, ...localAppointmentsStore];
+    barbershopApi.notify();
     return newApp;
   },
 
@@ -317,4 +390,38 @@ export const barbershopApi = {
       barberPayouts,
     };
   },
+
+  // Manager: Add new Worker / Barber (Добавить нового работника)
+  addBarber: async (data: {
+    firstName: string;
+    lastName: string;
+    phone: string;
+    specialty: string;
+    password?: string;
+    commissionPercent?: number;
+  }): Promise<Barber> => {
+    const fullName = `${data.firstName} ${data.lastName}`.trim();
+    const newBarber: Barber = {
+      id: `bar-${Date.now()}`,
+      name: fullName,
+      phone: data.phone,
+      specialty: data.specialty || 'Master Barber',
+      avatar: `https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80`,
+      rating: 5.0,
+      isWorkingToday: true,
+      status: 'FREE',
+      completedTodayCount: 0,
+      todayEarnings: 0,
+    };
+
+    localBarbersStore.push(newBarber);
+    return newBarber;
+  },
+
+  // Delete Worker / Barber (Удалить работника)
+  deleteBarber: async (id: string): Promise<boolean> => {
+    localBarbersStore = localBarbersStore.filter((b) => b.id !== id);
+    return true;
+  },
 };
+

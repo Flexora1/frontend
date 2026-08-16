@@ -11,8 +11,6 @@ import {
   Warehouse,
   BarChart3,
   Settings,
-  Sparkles,
-  ChevronRight,
   X,
   Scissors,
   Smartphone,
@@ -24,7 +22,6 @@ export type NavItemKey =
   | 'orders'
   | 'clients'
   | 'calendar'
-  | 'warehouse'
   | 'reports'
   | 'settings';
 
@@ -35,13 +32,12 @@ interface SidebarProps {
 }
 
 const navItems: { path: string; key: NavItemKey; label: string; icon: React.ElementType }[] = [
-  { path: '/', key: 'dashboard', label: 'Дашборд', icon: LayoutDashboard },
-  { path: '/orders', key: 'orders', label: 'Заказы / Navbatlar', icon: ShoppingCart },
-  { path: '/clients', key: 'clients', label: 'Клиенты (Mijozlar)', icon: Users },
-  { path: '/calendar', key: 'calendar', label: 'Календарь / Записи', icon: Calendar },
-  { path: '/warehouse', key: 'warehouse', label: 'Склад (Ombor)', icon: Warehouse },
-  { path: '/reports', key: 'reports', label: 'Отчёты (Hisobotlar)', icon: BarChart3 },
-  { path: '/settings', key: 'settings', label: 'Настройки', icon: Settings },
+  { path: '/manager', key: 'dashboard', label: 'Dashbord (Boshqaruv)', icon: LayoutDashboard },
+  { path: '/orders', key: 'orders', label: 'Navbatlar va Buyurtmalar', icon: ShoppingCart },
+  { path: '/clients', key: 'clients', label: 'Mijozlar bazasi', icon: Users },
+  { path: '/calendar', key: 'calendar', label: 'Jadval va Yozuvlar', icon: Calendar },
+  { path: '/reports', key: 'reports', label: 'Hisobotlar va Tahlil', icon: BarChart3 },
+  { path: '/settings', key: 'settings', label: 'Tizim sozlamalari', icon: Settings },
 ];
 
 export function Sidebar({
@@ -124,34 +120,7 @@ export function Sidebar({
         </Tooltip.Provider>
       </div>
 
-      {/* Footer section: Subscription plan badge & Upgrade button */}
-      <div className="p-3 border-t border-slate-200/80 dark:border-slate-800/80">
-        {!collapsed || isMobile ? (
-          <div className="p-3 rounded-2xl bg-gradient-to-br from-teal-500/10 via-emerald-500/5 to-transparent border border-teal-500/20 dark:border-teal-500/30">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-bold text-teal-700 dark:text-teal-300 flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5" /> PRO PLAN
-              </span>
-              <span className="text-[10px] font-semibold text-slate-400">24d left</span>
-            </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-2.5">
-              Bezlimat navbatlar va kunlik hisobotlar
-            </p>
-            <button className="w-full py-1.5 px-3 text-xs font-semibold text-white bg-teal-600 hover:bg-teal-700 dark:bg-teal-600 dark:hover:bg-teal-500 rounded-xl transition-colors cursor-pointer shadow-xs flex items-center justify-center gap-1">
-              Обновить план <ChevronRight className="w-3 h-3" />
-            </button>
-          </div>
-        ) : (
-          <div className="flex justify-center">
-            <button
-              title="Pro Plan (24d left)"
-              className="p-2.5 rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400 hover:bg-teal-500/20 transition-colors"
-            >
-              <Sparkles className="w-5 h-5" />
-            </button>
-          </div>
-        )}
-      </div>
+
     </div>
   );
 

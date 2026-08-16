@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Topbar } from '@/components/layout/Topbar';
@@ -9,14 +9,21 @@ import { OwnerDashboard } from '@/components/barbershop/OwnerDashboard';
 import { BarberView } from '@/components/barbershop/BarberView';
 import { ClientBookingView } from '@/components/barbershop/ClientBookingView';
 import { OrdersPage } from '@/components/orders/OrdersPage';
+import { ClientsView } from '@/components/clients/ClientsView';
+import { CalendarView } from '@/components/calendar/CalendarView';
+import { ReportsView } from '@/components/reports/ReportsView';
+import { SettingsView } from '@/components/settings/SettingsView';
 import { PartnerModulePlaceholder } from '@/components/placeholders/PartnerModulePlaceholder';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 export function AppContent() {
+  const location = useLocation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState<boolean>(false);
   const [isOffline, setIsOffline] = useState<boolean>(false);
+
+  const isClientPage = location.pathname === '/' || location.pathname === '/booking';
 
   const handleToggleOffline = () => {
     setIsOffline((prev) => {
@@ -50,70 +57,43 @@ export function AppContent() {
         onToggleSidebar={handleToggleSidebar}
       />
 
-      {/* Sidebar Navigation */}
-      <Sidebar
-        collapsed={sidebarCollapsed}
-        mobileOpen={mobileSidebarOpen}
-        onMobileOpenChange={setMobileSidebarOpen}
-      />
+      {/* Sidebar Navigation (Shown only for Manager & Worker views) */}
+      {!isClientPage && (
+        <Sidebar
+          collapsed={sidebarCollapsed}
+          mobileOpen={mobileSidebarOpen}
+          onMobileOpenChange={setMobileSidebarOpen}
+        />
+      )}
 
       {/* Main Workspace Content with React Router Routes */}
       <main
         className={cn(
           'transition-all duration-300 min-h-[calc(100vh-61px)] pb-12',
-          sidebarCollapsed ? 'md:pl-[72px]' : 'md:pl-[260px]'
+          isClientPage
+            ? 'pl-0 max-w-5xl mx-auto px-4'
+            : sidebarCollapsed
+            ? 'md:pl-[72px]'
+            : 'md:pl-[260px]'
         )}
       >
         <Routes>
-          <Route path="/" element={<OwnerDashboard />} />
-          <Route path="/orders" element={<OrdersPage />} />
-          <Route path="/barber" element={<BarberView />} />
+          {/* Default Home route is Client Booking */}
+          <Route path="/" element={<ClientBookingView />} />
           <Route path="/booking" element={<ClientBookingView />} />
-          <Route
-            path="/clients"
-            element={
-              <PartnerModulePlaceholder
-                title="Клиенты (Mijozlar)"
-                description="Зона ответственности второго разработчика команды. База постоянных клиентов и их история."
-              />
-            }
-          />
-          <Route
-            path="/calendar"
-            element={
-              <PartnerModulePlaceholder
-                title="Календарь / Записи"
-                description="Зона ответственности второго разработчика команды. Интерактивная сетка забронированных слотов."
-              />
-            }
-          />
-          <Route
-            path="/warehouse"
-            element={
-              <PartnerModulePlaceholder
-                title="Склад и Инвентарь (Ombor)"
-                description="Управление расходными материалами, шампунями и лезвиями."
-              />
-            }
-          />
-          <Route
-            path="/reports"
-            element={
-              <PartnerModulePlaceholder
-                title="Отчёты и Аналитика (Hisobotlar)"
-                description="Зона ответственности второго разработчика команды. Финансовая выгрузка и комиссионные выплат устам."
-              />
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <PartnerModulePlaceholder
-                title="Настройки"
-                description="Зона ответственности второго разработчика команды. Параметры барбершопа и график работы."
-              />
-            }
-          />
+
+          {/* Manager & Admin Route */}
+          <Route path="/manager" element={<OwnerDashboard />} />
+
+          {/* Barber / Master Route */}
+          <Route path="/barber" element={<BarberView />} />
+
+          <Route path="/orders" element={<OrdersPage />} />
+          <Route path="/clients" element={<ClientsView />} />
+          <Route path="/calendar" element={<CalendarView />} />
+
+          <Route path="/reports" element={<ReportsView />} />
+          <Route path="/settings" element={<SettingsView />} />
         </Routes>
       </main>
 

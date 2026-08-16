@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
-import { CommandDialog } from '@/components/ui/CommandDialog';
+import { AuthModal } from '@/components/auth/AuthModal';
 import { UserRole } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -38,6 +38,7 @@ export function Topbar({
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -101,93 +102,52 @@ export function Topbar({
             </div>
           </div>
 
-          {/* Center section: Role Switcher Segment (Ega / Usta / Mijoz) */}
-          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs">
-            <button
-              onClick={() => handleRoleSelect('OWNER')}
-              className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer select-none',
-                currentRole === 'OWNER'
-                  ? 'bg-white dark:bg-slate-900 text-teal-600 dark:text-teal-400 shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
-              )}
-            >
-              <Crown className="w-3.5 h-3.5 text-amber-500" />
-              <span>Ega</span>
-            </button>
+          {/* Center section: Role status indicator if in Manager or Master mode */}
+          {location.pathname.startsWith('/manager') ? (
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-500/10 border border-amber-500/30 flex items-center gap-1.5">
+                <Crown className="w-3.5 h-3.5 text-amber-500" /> Menejer Paneli
+              </span>
+              <button
+                onClick={() => navigate('/')}
+                className="px-2.5 py-1 text-xs font-medium text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 cursor-pointer"
+              >
+                Chiqish
+              </button>
+            </div>
+          ) : location.pathname.startsWith('/barber') ? (
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 text-xs font-bold text-teal-700 dark:text-teal-300 bg-teal-500/10 border border-teal-500/30 flex items-center gap-1.5">
+                <Scissors className="w-3.5 h-3.5 text-teal-500" /> Usta Kabineti
+              </span>
+              <button
+                onClick={() => navigate('/')}
+                className="px-2.5 py-1 text-xs font-medium text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 cursor-pointer"
+              >
+                Chiqish
+              </button>
+            </div>
+          ) : null}
 
-            <button
-              onClick={() => handleRoleSelect('BARBER')}
-              className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer select-none',
-                currentRole === 'BARBER'
-                  ? 'bg-white dark:bg-slate-900 text-teal-600 dark:text-teal-400 shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
-              )}
-            >
-              <Scissors className="w-3.5 h-3.5 text-teal-500" />
-              <span>Usta</span>
-            </button>
-
-            <button
-              onClick={() => handleRoleSelect('CLIENT')}
-              className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer select-none',
-                currentRole === 'CLIENT'
-                  ? 'bg-white dark:bg-slate-900 text-teal-600 dark:text-teal-400 shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
-              )}
-            >
-              <Smartphone className="w-3.5 h-3.5 text-sky-500" />
-              <span>Mijoz</span>
-            </button>
-          </div>
-
-          {/* Right section: Offline toggle, Theme toggle, User profile */}
+          {/* Right section: Theme toggle and Auth button */}
           <div className="flex items-center gap-2">
-            {/* Offline Network Simulation Trigger */}
-            <button
-              onClick={onToggleOffline}
-              title={isOffline ? 'Internet uzilgan (Oflayn)' : 'Internet ulangan (Onlayn)'}
-              className={cn(
-                'flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer select-none',
-                isOffline
-                  ? 'bg-amber-500/10 text-amber-600 border-amber-500/30'
-                  : 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30'
-              )}
-            >
-              {isOffline ? (
-                <>
-                  <WifiOff className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
-                  <span className="hidden md:inline">Oflayn</span>
-                </>
-              ) : (
-                <>
-                  <Wifi className="w-3.5 h-3.5 text-emerald-500" />
-                  <span className="hidden md:inline">Onlayn</span>
-                </>
-              )}
-            </button>
-
             {/* Theme Toggle */}
             <ThemeToggle />
 
-            <UserAvatar
-              name={
-                currentRole === 'OWNER'
-                  ? 'Alisher Xo\'ja (Ega)'
-                  : currentRole === 'BARBER'
-                  ? 'Usta Alisher'
-                  : 'Murod Ergashev'
-              }
-              size="md"
-            />
+            {/* Worker Login Button */}
+            <button
+              onClick={() => setAuthOpen(true)}
+              className="py-1.5 px-3 text-xs font-bold text-amber-800 dark:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-colors cursor-pointer flex items-center gap-1.5"
+            >
+              <User className="w-3.5 h-3.5 text-amber-500" />
+              <span>Xodim sifatida kirish</span>
+            </button>
           </div>
         </div>
       </motion.header>
 
-      {/* Global Search Dialog Modal */}
-      <CommandDialog open={searchOpen} onOpenChange={setSearchOpen} />
+      {/* Global Auth Modal */}
+      <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
     </>
   );
 }

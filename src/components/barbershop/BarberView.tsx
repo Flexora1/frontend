@@ -39,6 +39,8 @@ export function BarberView() {
 
   useEffect(() => {
     loadData();
+    const unsubscribe = barbershopApi.subscribe(loadData);
+    return () => unsubscribe();
   }, []);
 
   const activeBarber = barbers.find((b) => b.id === selectedBarberId) || barbers[0];
