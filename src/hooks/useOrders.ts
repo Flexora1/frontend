@@ -15,7 +15,7 @@ export function useOrders() {
       const data = await ordersApi.getOrders();
       setOrders(data);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Не удалось загрузить заказы';
+      const msg = err instanceof Error ? err.message : "Navbatlarni yuklab bo'lmadi";
       setError(msg);
       toast.error(msg);
     } finally {
@@ -45,10 +45,10 @@ export function useOrders() {
     try {
       const updatedOrder = await ordersApi.updateOrderStatus(orderId, newStatus, note);
       setOrders((prev) => prev.map((o) => (o.id === orderId ? updatedOrder : o)));
-      toast.success(`Статус заказа изменён на "${newStatus}"`);
+      toast.success(`Buyurtma holati "${newStatus}" ga o'zgartirildi`);
     } catch (err) {
       setOrders(previousOrders);
-      toast.error('Не удалось обновить статус заказа');
+      toast.error("Buyurtma holatini yangilab bo'lmadi");
     }
   };
 
@@ -58,10 +58,10 @@ export function useOrders() {
     try {
       const created = await ordersApi.createOrder(orderData);
       setOrders((prev) => [created, ...prev]);
-      toast.success(`Заказ ${created.orderNumber} успешно создан`);
+      toast.success(`${created.orderNumber} buyurtmasi muvaffaqiyatli yaratildi`);
       return created;
     } catch (err) {
-      toast.error('Ошибка при создании заказа');
+      toast.error("Buyurtma yaratishda xatolik");
       throw err;
     }
   };
@@ -72,10 +72,10 @@ export function useOrders() {
 
     try {
       await ordersApi.deleteOrder(orderId);
-      toast.success('Заказ успешно удалён');
+      toast.success("Buyurtma muvaffaqiyatli o'chirildi");
     } catch (err) {
       setOrders(previousOrders);
-      toast.error('Не удалось удалить заказ');
+      toast.error("Buyurtmani o'chirib bo'lmadi");
     }
   };
 
@@ -87,10 +87,10 @@ export function useOrders() {
 
     try {
       await ordersApi.batchUpdateStatus(orderIds, status);
-      toast.success(`Изменён статус для ${orderIds.length} заказов`);
+      toast.success(`${orderIds.length} ta buyurtma holati o'zgartirildi`);
     } catch (err) {
       setOrders(previousOrders);
-      toast.error('Ошибка при массовой смене статуса');
+      toast.error("Holatni ommaviy o'zgartirishda xatolik");
     }
   };
 
@@ -100,10 +100,10 @@ export function useOrders() {
 
     try {
       await ordersApi.batchDeleteOrders(orderIds);
-      toast.success(`Удалено заказов: ${orderIds.length}`);
+      toast.success(`O'chirilgan buyurtmalar: ${orderIds.length}`);
     } catch (err) {
       setOrders(previousOrders);
-      toast.error('Ошибка при массовом удалении');
+      toast.error("Ommaviy o'chirishda xatolik");
     }
   };
 

@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import * as Popover from '@radix-ui/react-popover';
 import { Calendar as CalendarIcon, X } from 'lucide-react';
 import { format } from 'date-fns';
-import { ru } from 'date-fns/locale';
+import { ru as ruLocale, uz as uzLocale } from 'date-fns/locale';
 import { DayPicker, DateRange } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 interface DateRangePickerProps {
   dateRange: DateRange | undefined;
@@ -18,18 +19,21 @@ export function DateRangePicker({
   onDateRangeChange,
   className,
 }: DateRangePickerProps) {
+  const { language, t } = useLanguage();
   const [open, setOpen] = useState(false);
+
+  const locale = language === 'ru' ? ruLocale : language === 'uz' ? uzLocale : undefined;
 
   const formattedLabel =
     dateRange?.from && dateRange?.to
-      ? `${format(dateRange.from, 'd MMM', { locale: ru })} - ${format(
+      ? `${format(dateRange.from, 'd MMM', { locale })} - ${format(
           dateRange.to,
           'd MMM yyyy',
-          { locale: ru }
+          { locale }
         )}`
       : dateRange?.from
-      ? format(dateRange.from, 'd MMM yyyy', { locale: ru })
-      : 'Период дат';
+      ? format(dateRange.from, 'd MMM yyyy', { locale })
+      : t('common.period');
 
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
@@ -67,7 +71,7 @@ export function DateRangePicker({
             defaultMonth={dateRange?.from || new Date()}
             selected={dateRange}
             onSelect={onDateRangeChange}
-            locale={ru}
+            locale={locale}
             numberOfMonths={1}
             className="rdp-custom"
           />

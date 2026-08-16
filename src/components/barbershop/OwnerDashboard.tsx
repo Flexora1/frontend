@@ -4,18 +4,11 @@ import {
   Scissors,
   DollarSign,
   Users,
-  Clock,
   Plus,
-  AlertTriangle,
   FileSpreadsheet,
   CheckCircle2,
   UserX,
   XCircle,
-  Sparkles,
-  Phone,
-  Calendar,
-  Wallet,
-  Building,
 } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { barbershopApi, barbershopServices } from '@/api/barbershopApi';
@@ -24,18 +17,17 @@ import {
   Appointment,
   AppointmentStatus,
   Barber,
-  SupplyItem,
   DailySummary,
   PaymentMethod,
 } from '@/types';
 import { formatCurrency } from '@/lib/utils';
+import { useLanguage } from '@/i18n/LanguageContext';
 import { toast } from 'sonner';
 
 export function OwnerDashboard() {
+  const { t } = useLanguage();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [barbers, setBarbers] = useState<Barber[]>([]);
   const [addWorkerOpen, setAddWorkerOpen] = useState(false);
-  const [supplies, setSupplies] = useState<SupplyItem[]>([]);
   const [dailySummary, setDailySummary] = useState<DailySummary | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -51,15 +43,13 @@ export function OwnerDashboard() {
 
   const loadData = async () => {
     try {
-      const [appData, barData, supData, sumData] = await Promise.all([
+      const [appData, barData, sumData] = await Promise.all([
         barbershopApi.getAppointments(),
         barbershopApi.getBarbers(),
-        barbershopApi.getSupplies(),
         barbershopApi.getDailySummary(),
       ]);
       setAppointments(appData);
       setBarbers(barData);
-      setSupplies(supData);
       setDailySummary(sumData);
     } catch (err) {
       console.error(err);
@@ -129,10 +119,8 @@ export function OwnerDashboard() {
     }
   };
 
-  const lowStockSupplies = supplies.filter((s) => s.currentStock <= s.minRequiredStock);
-
   if (loading || !dailySummary) {
-    return <div className="p-6 text-center text-sm text-slate-400">Yuklanmoqda...</div>;
+    return <div className="p-6 text-center text-sm text-slate-400">{t('common.loading')}</div>;
   }
 
   return (
@@ -142,15 +130,12 @@ export function OwnerDashboard() {
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 rounded-full bg-teal-500/10 text-teal-600 dark:text-teal-400 font-bold text-xs">
-              Sartaroshxona CRM
+              {t('dashboard.badge')}
             </span>
-            <span className="text-xs text-slate-400">Bugun: {new Date().toLocaleDateString('ru-RU')}</span>
+            <span className="text-xs text-slate-400">{t('dashboard.today')} {new Date().toLocaleDateString('ru-RU')}</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 mt-1">
-            Bugun menda nima bor?
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Mahalla sartaroshxonangizning bugungi navbatlari, tushumi va ustalar holati
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            {t('dashboard.subtitle')}
           </p>
         </div>
 
@@ -161,7 +146,7 @@ export function OwnerDashboard() {
             className="px-3.5 py-2 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
           >
             <FileSpreadsheet className="w-4 h-4 text-teal-600 dark:text-teal-400" />
-            Kunlik Hisobot
+            {t('dashboard.dailyReport')}
           </button>
 
           {/* Fast Walk-In Button */}
@@ -169,11 +154,10 @@ export function OwnerDashboard() {
             onClick={() => setWalkInOpen(true)}
             className="px-4 py-2 text-xs font-bold rounded-xl bg-teal-600 hover:bg-teal-700 text-white transition-colors flex items-center gap-1.5 cursor-pointer shadow-md"
           >
-            <Plus className="w-4 h-4" /> Tezkor navbat (Walk-In)
+            <Plus className="w-4 h-4" /> {t('dashboard.walkIn')}
           </button>
         </div>
       </div>
-
 
 
       {/* 4 KPI Cards Grid */}
@@ -182,7 +166,7 @@ export function OwnerDashboard() {
         <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Bugungi tushum
+              {t('dashboard.revenue')}
             </span>
             <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold">
               <DollarSign className="w-5 h-5" />
@@ -192,7 +176,7 @@ export function OwnerDashboard() {
             {formatCurrency(dailySummary.totalRevenue)}
           </div>
           <div className="text-[11px] text-slate-400">
-            Naqd: {formatCurrency(dailySummary.cashRevenue)} • Karta/Click: {formatCurrency(dailySummary.cardRevenue)}
+            {t('dashboard.cashCard', { cash: formatCurrency(dailySummary.cashRevenue), card: formatCurrency(dailySummary.cardRevenue) })}
           </div>
         </div>
 
@@ -200,7 +184,7 @@ export function OwnerDashboard() {
         <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Barcha navbatlar
+              {t('dashboard.appointments')}
             </span>
             <div className="w-9 h-9 rounded-xl bg-teal-500/10 text-teal-600 flex items-center justify-center font-bold">
               <Scissors className="w-5 h-5" />
@@ -210,7 +194,7 @@ export function OwnerDashboard() {
             {dailySummary.totalAppointments} ta
           </div>
           <div className="text-[11px] text-emerald-600 font-semibold">
-            Bajarildi: {dailySummary.completedCount} ta
+            {t('dashboard.completed', { count: dailySummary.completedCount })}
           </div>
         </div>
 
@@ -218,7 +202,7 @@ export function OwnerDashboard() {
         <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Mijoz kelmadi (No-Show)
+              {t('dashboard.noShow')}
             </span>
             <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center font-bold">
               <UserX className="w-5 h-5" />
@@ -227,24 +211,24 @@ export function OwnerDashboard() {
           <div className="text-2xl font-extrabold text-amber-600 dark:text-amber-400">
             {dailySummary.noShowCount} ta
           </div>
-          <div className="text-[11px] text-slate-400">Navbat vaqti darhol bo'shatildi</div>
+          <div className="text-[11px] text-slate-400">{t('dashboard.noShowHint')}</div>
         </div>
 
         {/* Active Barbers */}
         <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Ishdagi ustalar
+              {t('dashboard.activeBarbers')}
             </span>
             <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center font-bold">
               <Users className="w-5 h-5" />
             </div>
           </div>
           <div className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">
-            {barbers.filter((b) => b.isWorkingToday).length} usta
+            {t('dashboard.barbersCount', { count: barbers.filter((b) => b.isWorkingToday).length })}
           </div>
           <div className="text-[11px] text-purple-600 font-semibold">
-            Band: {barbers.filter((b) => b.status === 'BUSY').length} usta
+            {t('dashboard.busyCount', { count: barbers.filter((b) => b.status === 'BUSY').length })}
           </div>
         </div>
       </div>
@@ -254,16 +238,16 @@ export function OwnerDashboard() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
-              Bugungi Ustalar Navbat Jadvali
+              {t('dashboard.queueTitle')}
             </h2>
-            <span className="text-xs text-slate-400">Ustalar va ularning mijozlari</span>
+            <span className="text-xs text-slate-400">{t('dashboard.queueSubtitle')}</span>
           </div>
 
           <button
             onClick={() => setAddWorkerOpen(true)}
-            className="py-2 px-3 text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
+            className="py-2 px-3 text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs rounded-xl"
           >
-            <Plus className="w-4 h-4" /> Добавить нового работника
+            <Plus className="w-4 h-4" /> + Yangi xodim (ustani) qo'shish
           </button>
         </div>
 
@@ -302,7 +286,7 @@ export function OwnerDashboard() {
                         : 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
                     }`}
                   >
-                    {barber.status === 'BUSY' ? 'BAND (Kresloda)' : 'BO\'SH'}
+                    {barber.status === 'BUSY' ? t('dashboard.busy') : t('dashboard.free')}
                   </span>
                 </div>
 
@@ -313,7 +297,7 @@ export function OwnerDashboard() {
                     <div className="p-3.5 rounded-xl bg-teal-500/10 border border-teal-500/30 space-y-2">
                       <div className="flex items-center justify-between text-xs font-bold text-teal-700 dark:text-teal-300">
                         <span className="flex items-center gap-1">
-                          <Scissors className="w-3.5 h-3.5 animate-bounce" /> HOZIR KRESLODA
+                          <Scissors className="w-3.5 h-3.5 animate-bounce" /> {t('dashboard.inChair')}
                         </span>
                         <span className="font-mono">{inChairApp.scheduledTime}</span>
                       </div>
@@ -333,7 +317,7 @@ export function OwnerDashboard() {
                           onClick={() => handleStatusChange(inChairApp.id, 'COMPLETED')}
                           className="w-full py-1.5 px-2 rounded-lg bg-teal-600 text-white font-bold text-xs hover:bg-teal-700 transition-colors flex items-center justify-center gap-1 cursor-pointer"
                         >
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Tugallandi
+                          <CheckCircle2 className="w-3.5 h-3.5" /> {t('dashboard.done')}
                         </button>
                       </div>
                     </div>
@@ -342,7 +326,7 @@ export function OwnerDashboard() {
                   {/* Waiting Queue */}
                   <div className="space-y-2">
                     <div className="text-xs font-bold text-slate-400 uppercase tracking-wider flex justify-between">
-                      <span>Kutayotganlar ({waitingApps.length})</span>
+                      <span>{t('dashboard.waiting', { count: waitingApps.length })}</span>
                     </div>
 
                     {waitingApps.map((app) => (
@@ -372,14 +356,14 @@ export function OwnerDashboard() {
                             onClick={() => handleStatusChange(app.id, 'IN_CHAIR')}
                             className="flex-1 py-1 text-[11px] font-bold rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-colors cursor-pointer"
                           >
-                            Kresloga
+                            {t('dashboard.toChair')}
                           </button>
                           <button
                             onClick={() => handleStatusChange(app.id, 'NO_SHOW')}
                             title="Mijoz kelmadi deb belgilash"
                             className="px-2 py-1 text-[11px] font-bold rounded-lg bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 transition-colors cursor-pointer flex items-center gap-0.5"
                           >
-                            <UserX className="w-3 h-3" /> Kelmadi
+                            <UserX className="w-3 h-3" /> {t('dashboard.noShowBtn')}
                           </button>
                           <button
                             onClick={() => handleStatusChange(app.id, 'CANCELLED')}
@@ -394,7 +378,7 @@ export function OwnerDashboard() {
 
                     {waitingApps.length === 0 && !inChairApp && (
                       <div className="p-4 text-center text-xs text-slate-400 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
-                        Hozircha navbatda hech kim yo'q
+                        {t('dashboard.noQueue')}
                       </div>
                     )}
                   </div>
@@ -402,7 +386,7 @@ export function OwnerDashboard() {
                   {/* Completed Today */}
                   {completedApps.length > 0 && (
                     <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-400">
-                      Bugun bajarildi: <strong className="text-emerald-600">{completedApps.length} ta xizmat</strong>
+                      {t('dashboard.completedToday', { count: completedApps.length })}
                     </div>
                   )}
                 </div>
@@ -419,16 +403,16 @@ export function OwnerDashboard() {
           <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-6 border border-slate-200 dark:border-slate-800 z-50">
             <Dialog.Title className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <Plus className="w-5 h-5 text-teal-600" />
-              Tezkor navbat qo'shish (Ko'chadan kelgan)
+              {t('walkin.title')}
             </Dialog.Title>
             <Dialog.Description className="text-xs text-slate-500 mt-1 mb-4">
-              Онлайн брон қилмай кўчадан кириб келган мижозни дарҳол навбатга ёзиш
+              {t('walkin.desc')}
             </Dialog.Description>
 
             <form onSubmit={handleCreateWalkIn} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Mijoz Ismi *
+                  {t('walkin.clientName')}
                 </label>
                 <input
                   type="text"
@@ -441,7 +425,7 @@ export function OwnerDashboard() {
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Telefon raqami (Ixtiyoriy)
+                  {t('walkin.phone')}
                 </label>
                 <input
                   type="text"
@@ -453,7 +437,7 @@ export function OwnerDashboard() {
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Ustani tanlang
+                  {t('walkin.barber')}
                 </label>
                 <select
                   value={walkInBarberId}
@@ -470,7 +454,7 @@ export function OwnerDashboard() {
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Xizmat turi
+                  {t('walkin.service')}
                 </label>
                 <select
                   value={walkInServiceId}
@@ -491,13 +475,13 @@ export function OwnerDashboard() {
                   onClick={() => setWalkInOpen(false)}
                   className="px-4 py-2 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-800"
                 >
-                  Bekor qilish
+                  {t('walkin.cancel')}
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 text-xs font-bold rounded-xl bg-teal-600 text-white hover:bg-teal-700"
                 >
-                  Navbatga qo'shish
+                  {t('walkin.add')}
                 </button>
               </div>
             </form>
@@ -514,27 +498,27 @@ export function OwnerDashboard() {
               <div>
                 <Dialog.Title className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                   <FileSpreadsheet className="w-5 h-5 text-teal-600" />
-                  Kunlik Moliyaviy Hisobot
+                  {t('summary.title')}
                 </Dialog.Title>
-                <div className="text-xs text-slate-400">Bugungi umumiy daromad va ustalar ulushi</div>
+                <div className="text-xs text-slate-400">{t('summary.subtitle')}</div>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-800/60">
-                <div className="text-slate-400">Umumiy tushum</div>
+                <div className="text-slate-400">{t('summary.total')}</div>
                 <div className="text-base font-extrabold text-teal-600 dark:text-teal-400 mt-0.5">
                   {formatCurrency(dailySummary.totalRevenue)}
                 </div>
               </div>
 
               <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-800/60">
-                <div className="text-slate-400">Naqd / Karta</div>
+                <div className="text-slate-400">{t('summary.cashCard')}</div>
                 <div className="text-xs font-bold text-slate-900 dark:text-slate-100 mt-1">
-                  Naqd: {formatCurrency(dailySummary.cashRevenue)}
+                  {t('summary.cash', { value: formatCurrency(dailySummary.cashRevenue) })}
                 </div>
                 <div className="text-xs font-bold text-slate-900 dark:text-slate-100">
-                  Karta: {formatCurrency(dailySummary.cardRevenue)}
+                  {t('summary.card', { value: formatCurrency(dailySummary.cardRevenue) })}
                 </div>
               </div>
             </div>
@@ -542,7 +526,7 @@ export function OwnerDashboard() {
             {/* Barber Commissions Table */}
             <div className="space-y-2">
               <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                Ustalar Ulushi va Ularning Ish Hqi (50% Ulush)
+                {t('summary.mastersShare')}
               </div>
               <div className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
                 {dailySummary.barberPayouts.map((bp) => (
@@ -552,10 +536,10 @@ export function OwnerDashboard() {
                     </span>
                     <div className="text-right">
                       <div className="font-bold text-slate-900 dark:text-slate-100">
-                        Ish haqi: {formatCurrency(bp.barberShare)}
+                        {t('summary.salary', { value: formatCurrency(bp.barberShare) })}
                       </div>
                       <div className="text-[10px] text-slate-400">
-                        Umumiy tushumi: {formatCurrency(bp.earnedTotal)}
+                        {t('summary.earned', { value: formatCurrency(bp.earnedTotal) })}
                       </div>
                     </div>
                   </div>
@@ -568,7 +552,7 @@ export function OwnerDashboard() {
                 onClick={() => setSummaryOpen(false)}
                 className="px-4 py-2 text-xs font-bold rounded-xl bg-teal-600 text-white hover:bg-teal-700"
               >
-                Yopish
+                {t('summary.close')}
               </button>
             </div>
           </Dialog.Content>

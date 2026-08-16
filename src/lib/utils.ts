@@ -6,12 +6,14 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatCurrency(amount: number): string {
-  return `${new Intl.NumberFormat('uz-UZ').format(amount)} so'm`;
+  return `${new Intl.NumberFormat('uz-UZ', {
+    maximumFractionDigits: 0,
+  }).format(amount)} so'm`;
 }
 
 export function formatDate(dateString: string | Date): string {
   const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
-  return new Intl.DateTimeFormat('ru-RU', {
+  return new Intl.DateTimeFormat('uz-UZ', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',

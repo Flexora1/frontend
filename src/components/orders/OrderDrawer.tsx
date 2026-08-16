@@ -19,6 +19,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 interface OrderDrawerProps {
   order: Order | null;
@@ -35,6 +36,7 @@ export function OrderDrawer({
   onStatusChange,
   onDeleteOrder,
 }: OrderDrawerProps) {
+  const { t } = useLanguage();
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
   if (!order) return null;
@@ -49,7 +51,7 @@ export function OrderDrawer({
             <div className="flex items-center justify-between p-5 border-b border-slate-200/80 dark:border-slate-800/80">
               <div>
                 <div className="text-xs font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider">
-                  Детали заказа
+                  {t('drawer.details')}
                 </div>
                 <div className="text-lg font-extrabold text-slate-900 dark:text-slate-100 font-mono">
                   {order.orderNumber}
@@ -65,14 +67,14 @@ export function OrderDrawer({
               {/* Status & Quick Switcher */}
               <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between">
                 <div>
-                  <div className="text-xs font-semibold text-slate-400 mb-1">Текущий статус</div>
+                  <div className="text-xs font-semibold text-slate-400 mb-1">{t('drawer.currentStatus')}</div>
                   <StatusBadge status={order.status} />
                 </div>
 
                 <DropdownMenu.Root>
                   <DropdownMenu.Trigger asChild>
                     <button className="px-3 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs">
-                      Изменить статус <ChevronDown className="w-3.5 h-3.5" />
+                      {t('drawer.changeStatus')} <ChevronDown className="w-3.5 h-3.5" />
                     </button>
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Portal>
@@ -100,7 +102,7 @@ export function OrderDrawer({
               {/* Client Info Card */}
               <div className="space-y-3">
                 <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                  Информация о клиенте
+                  {t('drawer.clientInfo')}
                 </div>
                 <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 space-y-3">
                   <div className="flex items-center gap-3">
@@ -133,7 +135,7 @@ export function OrderDrawer({
               {/* Order Services Breakdown */}
               <div className="space-y-3">
                 <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                  Состав заказа
+                  {t('drawer.orderItems')}
                 </div>
                 <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 space-y-3">
                   <div className="font-bold text-sm text-slate-900 dark:text-slate-100">
@@ -156,7 +158,7 @@ export function OrderDrawer({
                   )}
 
                   <div className="flex justify-between items-center pt-3 border-t border-slate-100 dark:border-slate-800">
-                    <span className="text-xs font-semibold text-slate-500">Итоговая сумма</span>
+                    <span className="text-xs font-semibold text-slate-500">{t('drawer.total')}</span>
                     <span className="text-base font-extrabold text-teal-600 dark:text-teal-400">
                       {formatCurrency(order.totalAmount)}
                     </span>
@@ -168,7 +170,7 @@ export function OrderDrawer({
               <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 space-y-2 text-xs">
                 <div className="flex items-center justify-between text-slate-500">
                   <span className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-slate-400" /> Дата создания
+                    <Clock className="w-3.5 h-3.5 text-slate-400" /> {t('drawer.created')}
                   </span>
                   <span className="font-semibold text-slate-900 dark:text-slate-100">
                     {formatDate(order.createdAt)}
@@ -178,7 +180,7 @@ export function OrderDrawer({
                 {order.deadline && (
                   <div className="flex items-center justify-between text-slate-500 pt-1">
                     <span className="flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-slate-400" /> Дедлайн
+                      <Calendar className="w-3.5 h-3.5 text-slate-400" /> {t('drawer.deadline')}
                     </span>
                     <span className="font-semibold text-teal-600 dark:text-teal-400">
                       {formatDate(order.deadline)}
@@ -191,7 +193,7 @@ export function OrderDrawer({
               {order.notes && (
                 <div className="p-4 rounded-2xl bg-amber-500/5 dark:bg-amber-500/10 border border-amber-500/20 text-xs">
                   <div className="font-bold text-amber-700 dark:text-amber-400 mb-1 flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5" /> Заметки к заказу
+                    <FileText className="w-3.5 h-3.5" /> {t('drawer.notes')}
                   </div>
                   <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                     {order.notes}
@@ -203,7 +205,7 @@ export function OrderDrawer({
               {order.statusHistory && order.statusHistory.length > 0 && (
                 <div className="space-y-3">
                   <div className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <History className="w-3.5 h-3.5" /> История статусов
+                    <History className="w-3.5 h-3.5" /> {t('drawer.history')}
                   </div>
                   <div className="pl-3 border-l-2 border-slate-200 dark:border-slate-800 space-y-4 text-xs">
                     {order.statusHistory.map((h) => (
@@ -230,14 +232,14 @@ export function OrderDrawer({
                 onClick={() => setConfirmDeleteOpen(true)}
                 className="px-4 py-2 text-xs font-semibold rounded-xl bg-rose-500/10 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer flex items-center gap-1.5"
               >
-                <Trash2 className="w-4 h-4" /> Удалить
+                <Trash2 className="w-4 h-4" /> {t('drawer.delete')}
               </button>
 
               <button
                 type="button"
                 className="px-4 py-2 text-xs font-semibold rounded-xl bg-teal-600 hover:bg-teal-700 text-white transition-colors cursor-pointer shadow-xs flex items-center gap-1.5"
               >
-                <Edit className="w-4 h-4" /> Редактировать
+                <Edit className="w-4 h-4" /> {t('drawer.edit')}
               </button>
             </div>
           </Dialog.Content>
@@ -248,9 +250,9 @@ export function OrderDrawer({
       <ConfirmDialog
         open={confirmDeleteOpen}
         onOpenChange={setConfirmDeleteOpen}
-        title="Удалить заказ?"
-        description={`Вы действительно хотите безвозвратно удалить заказ ${order.orderNumber}?`}
-        confirmText="Да, удалить"
+        title={t('drawer.deleteTitle')}
+        description={t('drawer.deleteDesc', { order: order.orderNumber })}
+        confirmText={t('drawer.confirmDelete')}
         variant="danger"
         onConfirm={() => {
           onDeleteOrder(order.id);

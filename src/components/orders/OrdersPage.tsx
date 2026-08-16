@@ -20,6 +20,7 @@ import { NewOrderModal } from './NewOrderModal';
 import { DateRangePicker } from '@/components/ui/DateRangePicker';
 import { TableSkeleton } from '@/components/ui/LoadingSkeleton';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 export function OrdersPage({
   selectedOrderFromNav,
@@ -28,6 +29,7 @@ export function OrdersPage({
   selectedOrderFromNav?: Order | null;
   onClearSelectedOrderNav?: () => void;
 }) {
+  const { t } = useLanguage();
   const {
     orders,
     loading,
@@ -121,11 +123,11 @@ export function OrdersPage({
   };
 
   const allStatuses: { status: OrderStatus; label: string }[] = [
-    { status: 'NEW', label: 'Новый' },
-    { status: 'IN_PROGRESS', label: 'В работе' },
-    { status: 'READY', label: 'Готов' },
-    { status: 'DELIVERED', label: 'Выдан' },
-    { status: 'CANCELLED', label: 'Отменён' },
+    { status: 'NEW', label: t('status.NEW') },
+    { status: 'IN_PROGRESS', label: t('status.IN_PROGRESS') },
+    { status: 'READY', label: t('status.READY') },
+    { status: 'DELIVERED', label: t('status.DELIVERED') },
+    { status: 'CANCELLED', label: t('status.CANCELLED') },
   ];
 
   if (loading) {
@@ -147,10 +149,10 @@ export function OrdersPage({
       >
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-            Заказы
+            {t('orders.title')}
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Управление заявками, канбан-доской и статусами исполнения
+            {t('orders.subtitle')}
           </p>
         </div>
 
@@ -166,7 +168,7 @@ export function OrdersPage({
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               )}
             >
-              <Kanban className="w-3.5 h-3.5" /> Канбан
+              <Kanban className="w-3.5 h-3.5" /> {t('orders.kanban')}
             </button>
             <button
               onClick={() => setViewMode('table')}
@@ -177,7 +179,7 @@ export function OrdersPage({
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               )}
             >
-              <TableIcon className="w-3.5 h-3.5" /> Таблица
+              <TableIcon className="w-3.5 h-3.5" /> {t('orders.table')}
             </button>
           </div>
 
@@ -186,7 +188,7 @@ export function OrdersPage({
             onClick={() => setNewModalOpen(true)}
             className="px-4 py-2 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 dark:bg-teal-600 dark:hover:bg-teal-500 rounded-xl transition-colors cursor-pointer shadow-xs flex items-center gap-1.5"
           >
-            <Plus className="w-4 h-4" /> Новый заказ
+            <Plus className="w-4 h-4" /> {t('orders.newOrder')}
           </button>
         </div>
       </motion.div>
@@ -201,7 +203,7 @@ export function OrdersPage({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Поиск по клиенту или услуге..."
+              placeholder={t('orders.search')}
               className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
@@ -213,8 +215,8 @@ export function OrdersPage({
                 <Filter className="w-3.5 h-3.5 text-slate-400" />
                 <span>
                   {selectedStatuses.length === 0
-                    ? 'Все статусы'
-                    : `Статусы (${selectedStatuses.length})`}
+                    ? t('orders.allStatuses')
+                    : t('orders.statuses', { count: selectedStatuses.length })}
                 </span>
               </button>
             </DropdownMenu.Trigger>
@@ -252,7 +254,7 @@ export function OrdersPage({
             onClick={resetFilters}
             className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition-colors cursor-pointer"
           >
-            <RotateCcw className="w-3.5 h-3.5" /> Сбросить фильтры
+            <RotateCcw className="w-3.5 h-3.5" /> {t('orders.resetFilters')}
           </button>
         )}
       </div>

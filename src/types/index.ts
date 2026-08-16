@@ -123,13 +123,14 @@ export interface Order {
 export interface Client {
   id: string;
   name: string;
-  email: string;
+  email?: string;
   phone: string;
   avatar?: string;
   company?: string;
   totalOrders: number;
   totalSpent: number;
   createdAt: string;
+  lastVisit?: string;
 }
 
 export interface Product {

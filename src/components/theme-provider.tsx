@@ -26,16 +26,16 @@ export function ThemeProvider({
   storageKey = 'flexora-ui-theme',
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
+  const [theme, setThemeState] = useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   );
 
-  useEffect(() => {
+  const applyTheme = React.useCallback((nextTheme: Theme) => {
     const root = window.document.documentElement;
 
     root.classList.remove('light', 'dark');
 
-    if (theme === 'system') {
+    if (nextTheme === 'system') {
       const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
         ? 'dark'
         : 'light';
@@ -44,15 +44,35 @@ export function ThemeProvider({
       return;
     }
 
-    root.classList.add(theme);
-  }, [theme]);
+    root.classList.add(nextTheme);
+  }, []);
+
+  useEffect(() => {
+    applyTheme(theme);
+  }, [theme, applyTheme]);
+
+  const setTheme = React.useCallback(
+    (nextTheme: Theme) => {
+      localStorage.setItem(storageKey, nextTheme);
+      setThemeState(nextTheme);
+
+      // Smooth cross-fade between light and dark via the View Transitions API.
+      // Falls back to the global CSS color transitions when unsupported.
+      const doc = document as Document & {
+        startViewTransition?: (callback: () => void) => void;
+      };
+      if (typeof doc.startViewTransition === 'function') {
+        doc.startViewTransition(() => applyTheme(nextTheme));
+      } else {
+        applyTheme(nextTheme);
+      }
+    },
+    [storageKey, applyTheme]
+  );
 
   const value = {
     theme,
-    setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme);
-      setTheme(theme);
-    },
+    setTheme,
   };
 
   return (

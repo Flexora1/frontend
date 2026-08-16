@@ -1,6 +1,7 @@
 import React from 'react';
 import { PackageOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 interface EmptyStateProps {
   title?: string;
@@ -11,12 +12,16 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({
-  title = 'Данные отсутствуют',
-  description = 'По вашему запросу ничего не найдено.',
+  title,
+  description,
   icon,
   action,
   className,
 }: EmptyStateProps) {
+  const { t } = useLanguage();
+  const resolvedTitle = title ?? t('common.emptyTitle');
+  const resolvedDescription = description ?? t('common.emptyDesc');
+
   return (
     <div
       className={cn(
@@ -28,10 +33,10 @@ export function EmptyState({
         {icon || <PackageOpen className="w-6 h-6" />}
       </div>
       <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
-        {title}
+        {resolvedTitle}
       </h3>
       <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 max-w-sm">
-        {description}
+        {resolvedDescription}
       </p>
       {action && <div className="mt-5">{action}</div>}
     </div>

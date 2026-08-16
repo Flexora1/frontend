@@ -8,14 +8,12 @@ import {
   ShoppingCart,
   Users,
   Calendar,
-  Warehouse,
   BarChart3,
   Settings,
   X,
-  Scissors,
-  Smartphone,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 export type NavItemKey =
   | 'dashboard'
@@ -31,13 +29,13 @@ interface SidebarProps {
   onMobileOpenChange: (open: boolean) => void;
 }
 
-const navItems: { path: string; key: NavItemKey; label: string; icon: React.ElementType }[] = [
-  { path: '/manager', key: 'dashboard', label: 'Dashbord (Boshqaruv)', icon: LayoutDashboard },
-  { path: '/orders', key: 'orders', label: 'Navbatlar va Buyurtmalar', icon: ShoppingCart },
-  { path: '/clients', key: 'clients', label: 'Mijozlar bazasi', icon: Users },
-  { path: '/calendar', key: 'calendar', label: 'Jadval va Yozuvlar', icon: Calendar },
-  { path: '/reports', key: 'reports', label: 'Hisobotlar va Tahlil', icon: BarChart3 },
-  { path: '/settings', key: 'settings', label: 'Tizim sozlamalari', icon: Settings },
+const navItems: { path: string; key: NavItemKey; labelKey: string; defaultLabel: string; icon: React.ElementType }[] = [
+  { path: '/manager', key: 'dashboard', labelKey: 'nav.dashboard', defaultLabel: 'Dashbord', icon: LayoutDashboard },
+  { path: '/orders', key: 'orders', labelKey: 'nav.orders', defaultLabel: 'Navbatlar va Buyurtmalar', icon: ShoppingCart },
+  { path: '/clients', key: 'clients', labelKey: 'nav.clients', defaultLabel: 'Mijozlar bazasi', icon: Users },
+  { path: '/calendar', key: 'calendar', labelKey: 'nav.calendar', defaultLabel: 'Jadval va Yozuvlar', icon: Calendar },
+  { path: '/reports', key: 'reports', labelKey: 'nav.reports', defaultLabel: 'Hisobotlar va Tahlil', icon: BarChart3 },
+  { path: '/settings', key: 'settings', labelKey: 'nav.settings', defaultLabel: 'Tizim sozlamalari', icon: Settings },
 ];
 
 export function Sidebar({
@@ -47,6 +45,16 @@ export function Sidebar({
 }: SidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useLanguage();
+
+  const getLabel = (item: typeof navItems[0]) => {
+    try {
+      const translated = t(item.labelKey);
+      return translated && translated !== item.labelKey ? translated : item.defaultLabel;
+    } catch {
+      return item.defaultLabel;
+    }
+  };
 
   const sidebarContent = (isMobile = false) => (
     <div className="flex flex-col h-full bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800/80 select-none">
@@ -58,6 +66,7 @@ export function Sidebar({
             const isActive =
               location.pathname === item.path ||
               (item.path !== '/' && location.pathname.startsWith(item.path));
+            const labelText = getLabel(item);
 
             const buttonEl = (
               <button
@@ -73,7 +82,6 @@ export function Sidebar({
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                 )}
               >
-                {/* Active left indicator bar with framer-motion layoutId */}
                 {isActive && (
                   <motion.div
                     layoutId="activeNavIndicator"
@@ -92,7 +100,7 @@ export function Sidebar({
                 />
 
                 {(!collapsed || isMobile) && (
-                  <span className="truncate">{item.label}</span>
+                  <span className="truncate">{labelText}</span>
                 )}
               </button>
             );
@@ -107,7 +115,7 @@ export function Sidebar({
                       sideOffset={12}
                       className="z-50 px-3 py-1.5 text-xs font-semibold text-white bg-slate-900 dark:bg-slate-800 rounded-lg shadow-lg"
                     >
-                      {item.label}
+                      {labelText}
                       <Tooltip.Arrow className="fill-slate-900 dark:fill-slate-800" />
                     </Tooltip.Content>
                   </Tooltip.Portal>
@@ -119,8 +127,6 @@ export function Sidebar({
           })}
         </Tooltip.Provider>
       </div>
-
-
     </div>
   );
 
@@ -142,7 +148,7 @@ export function Sidebar({
           <Dialog.Overlay className="md:hidden fixed inset-0 bg-black/40 backdrop-blur-xs z-50 animate-fade-in" />
           <Dialog.Content className="md:hidden fixed top-0 left-0 bottom-0 w-[280px] bg-white dark:bg-slate-900 z-50 shadow-2xl focus:outline-none animate-in slide-in-from-left">
             <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800">
-              <span className="font-bold text-slate-900 dark:text-slate-100">Меню Flexora</span>
+              <span className="font-bold text-slate-900 dark:text-slate-100">Menyu</span>
               <Dialog.Close className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
                 <X className="w-5 h-5" />
               </Dialog.Close>

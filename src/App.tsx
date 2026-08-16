@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from '@/components/theme-provider';
+import { LanguageProvider } from '@/i18n/LanguageContext';
 import { Topbar } from '@/components/layout/Topbar';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { OfflineBanner } from '@/components/barbershop/OfflineBanner';
@@ -13,7 +14,6 @@ import { ClientsView } from '@/components/clients/ClientsView';
 import { CalendarView } from '@/components/calendar/CalendarView';
 import { ReportsView } from '@/components/reports/ReportsView';
 import { SettingsView } from '@/components/settings/SettingsView';
-import { PartnerModulePlaceholder } from '@/components/placeholders/PartnerModulePlaceholder';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -91,7 +91,6 @@ export function AppContent() {
           <Route path="/orders" element={<OrdersPage />} />
           <Route path="/clients" element={<ClientsView />} />
           <Route path="/calendar" element={<CalendarView />} />
-
           <Route path="/reports" element={<ReportsView />} />
           <Route path="/settings" element={<SettingsView />} />
         </Routes>
@@ -106,7 +105,9 @@ export function AppContent() {
 export function App() {
   return (
     <ThemeProvider defaultTheme="light" storageKey="flexora-barber-theme">
-      <AppContent />
+      <LanguageProvider>
+        <AppContent />
+      </LanguageProvider>
     </ThemeProvider>
   );
 }
