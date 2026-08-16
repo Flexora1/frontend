@@ -21,6 +21,7 @@ import { Order, OrderStatus } from '@/types';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 interface OrdersTableProps {
   orders: Order[];
@@ -35,6 +36,7 @@ export function OrdersTable({
   onBatchStatusChange,
   onBatchDelete,
 }: OrdersTableProps) {
+  const { t } = useLanguage();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
 
@@ -68,7 +70,7 @@ export function OrdersTable({
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           className="flex items-center gap-1 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
         >
-          Заказ <ArrowUpDown className="w-3.5 h-3.5" />
+          {t('orders.order')} <ArrowUpDown className="w-3.5 h-3.5" />
         </button>
       ),
       cell: ({ row }) => (
@@ -84,7 +86,7 @@ export function OrdersTable({
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           className="flex items-center gap-1 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
         >
-          Клиент <ArrowUpDown className="w-3.5 h-3.5" />
+          {t('orders.client')} <ArrowUpDown className="w-3.5 h-3.5" />
         </button>
       ),
       cell: ({ row }) => (
@@ -101,7 +103,7 @@ export function OrdersTable({
     },
     {
       accessorKey: 'serviceName',
-      header: 'Услуга / Товар',
+      header: t('orders.service'),
       cell: ({ row }) => (
         <span className="text-slate-700 dark:text-slate-300">{row.original.serviceName}</span>
       ),
@@ -113,7 +115,7 @@ export function OrdersTable({
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           className="flex items-center gap-1 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
         >
-          Сумма <ArrowUpDown className="w-3.5 h-3.5" />
+          {t('orders.amount')} <ArrowUpDown className="w-3.5 h-3.5" />
         </button>
       ),
       cell: ({ row }) => (
@@ -124,12 +126,12 @@ export function OrdersTable({
     },
     {
       accessorKey: 'status',
-      header: 'Статус',
+      header: t('orders.status'),
       cell: ({ row }) => <StatusBadge status={row.original.status} />,
     },
     {
       accessorKey: 'createdAt',
-      header: 'Дата',
+      header: t('orders.date'),
       cell: ({ row }) => (
         <span className="text-xs text-slate-400">{formatDate(row.original.createdAt)}</span>
       ),
@@ -186,7 +188,7 @@ export function OrdersTable({
             {orders.length === 0 && (
               <tr>
                 <td colSpan={columns.length} className="text-center py-8 text-slate-400 text-sm">
-                  Заказов по заданным фильтрам не найдено
+                  {t('orders.notFound')}
                 </td>
               </tr>
             )}
@@ -197,12 +199,12 @@ export function OrdersTable({
       {/* Pagination Bar */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2 text-xs text-slate-500">
         <div>
-          Показано {table.getRowModel().rows.length} из {orders.length} заказов
+          {t('orders.shown', { shown: table.getRowModel().rows.length, total: orders.length })}
         </div>
 
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <span>Строк на странице:</span>
+            <span>{t('orders.perPage')}</span>
             <select
               value={table.getState().pagination.pageSize}
               onChange={(e) => table.setPageSize(Number(e.target.value))}
@@ -242,7 +244,7 @@ export function OrdersTable({
       {selectedOrderIds.length > 0 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-5 py-3 rounded-2xl bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-2xl animate-in fade-in slide-in-from-bottom-4">
           <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-teal-500 text-white">
-            Выбрано: {selectedOrderIds.length}
+            {t('orders.selected', { count: selectedOrderIds.length })}
           </span>
 
           <div className="h-4 w-px bg-slate-700 dark:bg-slate-300" />
@@ -252,7 +254,7 @@ export function OrdersTable({
             <DropdownMenu.Trigger asChild>
               <button className="px-3 py-1.5 text-xs font-semibold rounded-xl bg-slate-800 dark:bg-slate-200 hover:bg-slate-700 dark:hover:bg-slate-300 transition-colors flex items-center gap-1.5 cursor-pointer">
                 <CheckCircle2 className="w-4 h-4 text-teal-400 dark:text-teal-600" />
-                Сменить статус
+                {t('orders.changeStatus')}
               </button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Portal>
@@ -288,7 +290,7 @@ export function OrdersTable({
             className="px-3 py-1.5 text-xs font-semibold rounded-xl bg-rose-600 text-white hover:bg-rose-700 transition-colors flex items-center gap-1.5 cursor-pointer"
           >
             <Trash2 className="w-4 h-4" />
-            Удалить
+            {t('orders.delete')}
           </button>
         </div>
       )}

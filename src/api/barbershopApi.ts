@@ -3,6 +3,7 @@ import {
   AppointmentStatus,
   Barber,
   BarbershopService,
+  Client,
   SupplyItem,
   DailySummary,
   PaymentMethod,
@@ -12,10 +13,10 @@ import {
 const initialBarbers: Barber[] = [
   {
     id: 'bar-1',
-    name: 'Usta Alisher',
+    name: 'Master Alisher',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
     rating: 4.9,
-    specialty: 'Fade & Soqol ustasi',
+    specialty: 'Fade & Soqol masteri',
     isWorkingToday: true,
     status: 'BUSY',
     phone: '+7 (999) 111-22-33',
@@ -24,10 +25,10 @@ const initialBarbers: Barber[] = [
   },
   {
     id: 'bar-2',
-    name: 'Usta Rustam',
+    name: 'Master Rustam',
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
     rating: 4.8,
-    specialty: 'Klassik va Zamonaviy sochlarga usta',
+    specialty: 'Klassik va Zamonaviy sochlarga master',
     isWorkingToday: true,
     status: 'FREE',
     phone: '+7 (999) 222-33-44',
@@ -36,7 +37,7 @@ const initialBarbers: Barber[] = [
   },
   {
     id: 'bar-3',
-    name: 'Usta Jahongir',
+    name: 'Master Jahongir',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
     rating: 4.95,
     specialty: 'Bolalar sochi va Premium Kompleks',
@@ -107,7 +108,7 @@ const initialAppointments: Appointment[] = [
     clientPhone: '+998 90 123 45 67',
     clientAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
     barberId: 'bar-1',
-    barberName: 'Usta Alisher',
+    barberName: 'Master Alisher',
     serviceId: 'srv-1',
     serviceName: 'Soch kesish (Klassik / Fade)',
     totalAmount: 60000,
@@ -125,7 +126,7 @@ const initialAppointments: Appointment[] = [
     clientPhone: '+998 91 987 65 43',
     clientAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
     barberId: 'bar-1',
-    barberName: 'Usta Alisher',
+    barberName: 'Master Alisher',
     serviceId: 'srv-3',
     serviceName: 'VIP Kompleks (Soch + Soqol + Yuz parvarishi)',
     totalAmount: 120000,
@@ -141,7 +142,7 @@ const initialAppointments: Appointment[] = [
     clientName: 'Bobur Mansurov',
     clientPhone: '+998 93 555 11 22',
     barberId: 'bar-2',
-    barberName: 'Usta Rustam',
+    barberName: 'Master Rustam',
     serviceId: 'srv-2',
     serviceName: 'Soqol olish va forma berish',
     totalAmount: 40000,
@@ -157,7 +158,7 @@ const initialAppointments: Appointment[] = [
     clientName: 'Sherzod Mahmudov',
     clientPhone: '+998 97 777 88 99',
     barberId: 'bar-3',
-    barberName: 'Usta Jahongir',
+    barberName: 'Master Jahongir',
     serviceId: 'srv-4',
     serviceName: 'Bolalar soch turmagi',
     totalAmount: 50000,
@@ -173,7 +174,7 @@ const initialAppointments: Appointment[] = [
     clientName: 'Farrux Umarov',
     clientPhone: '+998 94 444 33 22',
     barberId: 'bar-2',
-    barberName: 'Usta Rustam',
+    barberName: 'Master Rustam',
     serviceId: 'srv-1',
     serviceName: 'Soch kesish (Klassik / Fade)',
     totalAmount: 60000,
@@ -260,7 +261,7 @@ export const barbershopApi = {
     const barber = localBarbersStore.find((b) => b.id === barberId);
     const service = barbershopServices.find((s) => s.id === serviceId);
 
-    if (!barber || !service) throw new Error('Usta yoki xizmat topilmadi');
+    if (!barber || !service) throw new Error('Master yoki xizmat topilmadi');
 
     const newApp: Appointment = {
       id: `app-${Date.now()}`,
@@ -281,6 +282,40 @@ export const barbershopApi = {
 
     localAppointmentsStore = [newApp, ...localAppointmentsStore];
     return newApp;
+  },
+
+  // GET Clients (Mijozlar) — derived from appointment history
+  getClients: async (): Promise<Client[]> => {
+    const clientsMap = new Map<string, Client>();
+
+    localAppointmentsStore.forEach((app) => {
+      const key = app.clientPhone || app.clientName;
+      const existing = clientsMap.get(key);
+      const totalAmount = app.status === 'COMPLETED' ? app.totalAmount : 0;
+
+      if (!existing) {
+        clientsMap.set(key, {
+          id: `cli-${key}`,
+          name: app.clientName,
+          phone: app.clientPhone,
+          avatar: app.clientAvatar,
+          totalOrders: 1,
+          totalSpent: totalAmount,
+          createdAt: app.createdAt,
+          lastVisit: app.createdAt,
+        });
+      } else {
+        existing.totalOrders += 1;
+        existing.totalSpent += totalAmount;
+        if (app.createdAt > existing.lastVisit!) {
+          existing.lastVisit = app.createdAt;
+        }
+      }
+    });
+
+    return Array.from(clientsMap.values()).sort(
+      (a, b) => b.totalOrders - a.totalOrders
+    );
   },
 
   // GET Daily Financial Summary (Kunlik hisobot)

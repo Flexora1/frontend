@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from '@/components/theme-provider';
+import { LanguageProvider } from '@/i18n/LanguageContext';
 import { Topbar } from '@/components/layout/Topbar';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { OfflineBanner } from '@/components/barbershop/OfflineBanner';
 import { OwnerDashboard } from '@/components/barbershop/OwnerDashboard';
-import { BarberView } from '@/components/barbershop/BarberView';
-import { ClientBookingView } from '@/components/barbershop/ClientBookingView';
+import { ReportsPage } from '@/components/barbershop/ReportsPage';
+import { ClientsPage } from '@/components/barbershop/ClientsPage';
 import { OrdersPage } from '@/components/orders/OrdersPage';
-import { PartnerModulePlaceholder } from '@/components/placeholders/PartnerModulePlaceholder';
+import { SettingsPage } from '@/components/settings/SettingsPage';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -67,53 +68,9 @@ export function AppContent() {
         <Routes>
           <Route path="/" element={<OwnerDashboard />} />
           <Route path="/orders" element={<OrdersPage />} />
-          <Route path="/barber" element={<BarberView />} />
-          <Route path="/booking" element={<ClientBookingView />} />
-          <Route
-            path="/clients"
-            element={
-              <PartnerModulePlaceholder
-                title="Клиенты (Mijozlar)"
-                description="Зона ответственности второго разработчика команды. База постоянных клиентов и их история."
-              />
-            }
-          />
-          <Route
-            path="/calendar"
-            element={
-              <PartnerModulePlaceholder
-                title="Календарь / Записи"
-                description="Зона ответственности второго разработчика команды. Интерактивная сетка забронированных слотов."
-              />
-            }
-          />
-          <Route
-            path="/warehouse"
-            element={
-              <PartnerModulePlaceholder
-                title="Склад и Инвентарь (Ombor)"
-                description="Управление расходными материалами, шампунями и лезвиями."
-              />
-            }
-          />
-          <Route
-            path="/reports"
-            element={
-              <PartnerModulePlaceholder
-                title="Отчёты и Аналитика (Hisobotlar)"
-                description="Зона ответственности второго разработчика команды. Финансовая выгрузка и комиссионные выплат устам."
-              />
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <PartnerModulePlaceholder
-                title="Настройки"
-                description="Зона ответственности второго разработчика команды. Параметры барбершопа и график работы."
-              />
-            }
-          />
+          <Route path="/clients" element={<ClientsPage />} />
+          <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Routes>
       </main>
 
@@ -126,7 +83,9 @@ export function AppContent() {
 export function App() {
   return (
     <ThemeProvider defaultTheme="light" storageKey="flexora-barber-theme">
-      <AppContent />
+      <LanguageProvider>
+        <AppContent />
+      </LanguageProvider>
     </ThemeProvider>
   );
 }

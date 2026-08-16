@@ -1,6 +1,7 @@
 import React from 'react';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Construction } from 'lucide-react';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 interface PartnerModulePlaceholderProps {
   title: string;
@@ -8,6 +9,7 @@ interface PartnerModulePlaceholderProps {
 }
 
 export function PartnerModulePlaceholder({ title, description }: PartnerModulePlaceholderProps) {
+  const { t } = useLanguage();
   return (
     <div className="p-4 sm:p-6 max-w-[1920px] mx-auto space-y-6">
       <div>
@@ -15,7 +17,7 @@ export function PartnerModulePlaceholder({ title, description }: PartnerModulePl
           {title}
         </h1>
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-          Модуль находится в процессе совместной разработки второй части команды
+          {t('placeholder.inDevelopment')}
         </p>
       </div>
 

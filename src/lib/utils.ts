@@ -6,11 +6,10 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('ru-RU', {
-    style: 'currency',
-    currency: 'RUB',
+  // UZS so'm — no decimals, grouped with spaces
+  return `${new Intl.NumberFormat('uz-UZ', {
     maximumFractionDigits: 0,
-  }).format(amount);
+  }).format(amount)} so'm`;
 }
 
 export function formatDate(dateString: string | Date): string {

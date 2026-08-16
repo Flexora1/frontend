@@ -2,6 +2,7 @@ import React from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { AlertTriangle, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -20,12 +21,16 @@ export function ConfirmDialog({
   onOpenChange,
   title,
   description,
-  confirmText = 'Удалить',
-  cancelText = 'Отмена',
+  confirmText,
+  cancelText,
   variant = 'danger',
   onConfirm,
   loading = false,
 }: ConfirmDialogProps) {
+  const { t } = useLanguage();
+  const resolvedConfirmText = confirmText ?? t('common.delete');
+  const resolvedCancelText = cancelText ?? t('common.cancel');
+
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
@@ -61,7 +66,7 @@ export function ConfirmDialog({
               onClick={() => onOpenChange(false)}
               className="px-4 py-2 text-sm font-medium rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer select-none"
             >
-              {cancelText}
+              {resolvedCancelText}
             </button>
             <button
               type="button"
@@ -77,7 +82,7 @@ export function ConfirmDialog({
                 variant === 'primary' && 'bg-teal-600 hover:bg-teal-700'
               )}
             >
-              {loading ? 'Обработка...' : confirmText}
+              {loading ? t('common.processing') : resolvedConfirmText}
             </button>
           </div>
         </Dialog.Content>

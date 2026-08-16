@@ -20,6 +20,7 @@ import { Order, OrderStatus } from '@/types';
 import { OrderCard } from './OrderCard';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 interface KanbanViewProps {
   orders: Order[];
@@ -27,12 +28,12 @@ interface KanbanViewProps {
   onSelectOrder: (order: Order) => void;
 }
 
-const columns: { status: OrderStatus; label: string; dotColor: string }[] = [
-  { status: 'NEW', label: 'Новый', dotColor: 'bg-sky-500' },
-  { status: 'IN_PROGRESS', label: 'В работе', dotColor: 'bg-teal-500' },
-  { status: 'READY', label: 'Готов', dotColor: 'bg-purple-500' },
-  { status: 'DELIVERED', label: 'Выдан', dotColor: 'bg-emerald-500' },
-  { status: 'CANCELLED', label: 'Отменён', dotColor: 'bg-rose-500' },
+const columns: { status: OrderStatus; labelKey: string; dotColor: string }[] = [
+  { status: 'NEW', labelKey: 'status.NEW', dotColor: 'bg-sky-500' },
+  { status: 'IN_PROGRESS', labelKey: 'status.IN_PROGRESS', dotColor: 'bg-teal-500' },
+  { status: 'READY', labelKey: 'status.READY', dotColor: 'bg-purple-500' },
+  { status: 'DELIVERED', labelKey: 'status.DELIVERED', dotColor: 'bg-emerald-500' },
+  { status: 'CANCELLED', labelKey: 'status.CANCELLED', dotColor: 'bg-rose-500' },
 ];
 
 function KanbanColumn({
@@ -40,10 +41,11 @@ function KanbanColumn({
   orders,
   onSelectOrder,
 }: {
-  column: { status: OrderStatus; label: string; dotColor: string };
+  column: { status: OrderStatus; labelKey: string; dotColor: string };
   orders: Order[];
   onSelectOrder: (order: Order) => void;
 }) {
+  const { t } = useLanguage();
   const { isOver, setNodeRef } = useDroppable({
     id: column.status,
   });
@@ -63,7 +65,7 @@ function KanbanColumn({
         <div className="flex items-center gap-2">
           <span className={cn('w-2.5 h-2.5 rounded-full', column.dotColor)} />
           <span className="font-bold text-sm text-slate-900 dark:text-slate-100">
-            {column.label}
+            {t(column.labelKey)}
           </span>
         </div>
         <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 shadow-2xs">
@@ -82,7 +84,7 @@ function KanbanColumn({
           ))}
           {orders.length === 0 && (
             <div className="h-24 flex items-center justify-center text-xs text-slate-400 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
-              Перетащите сюда
+              {t('orders.dragHere')}
             </div>
           )}
         </div>
